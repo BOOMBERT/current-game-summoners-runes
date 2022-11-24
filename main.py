@@ -25,23 +25,12 @@ def get_api_key():
 
 class Summoner:
 
-    def __init__(self, summoner_name, summoner_info_api, api_key):
-        self._summoner_name = summoner_name
-        self._summoner_info_api = summoner_info_api
-        self._api_key = api_key
-        self._summoner_info = None
+    def __init__(self, summoner_info_from_request):
+        self.summoner_info_from_request = summoner_info_from_request
 
-    def get_summoner_info(self):
-        summoner_info_request = requests.get(
-            url=f"{self._summoner_info_api}{self._summoner_name}",
-            params={
-                "api_key": self._api_key
-            })
-
-        if check_for_errors(summoner_info_request):
-            self._summoner_info = summoner_info_request.json()
-
-            return self._summoner_info
+    def summoner_info(self):
+        if check_for_errors(self.summoner_info_from_request):
+            return self.summoner_info_from_request.json()
 
         print("Summoner with this username does not exist")
         sys.exit(1)
@@ -49,39 +38,23 @@ class Summoner:
 
 class Game:
 
-    def __init__(self, current_game_info_api, api_key, game_info):
-        self._current_game_info_api = current_game_info_api
-        self._api_key = api_key
-        self._game_info = game_info
-        self._current_game_info = None
+    def __init__(self, game_info_from_request):
+        self.game_info_from_request = game_info_from_request
 
-    def get_current_game_info(self):
-        current_game_info_request = requests.get(
-            url=f"{self._current_game_info_api}{self._game_info['id']}",
-            params={
-                "api_key": self._api_key
-            })
-
-        if check_for_errors(current_game_info_request):
-            self._current_game_info = current_game_info_request.json()
-
-            return self._current_game_info
+    def current_game_info(self):
+        if check_for_errors(self.game_info_from_request):
+            return self.game_info_from_request.json()
 
         print('The summoner is not currently in the game')
         sys.exit(1)
 
 
-def current_game_summoners_info(current_game_info):
-    summoner_names = []
-    champions = []
-    runes = []
-
-    for participant in current_game_info['participants']:
-        summoner_names.append(participant['summonerName'])
-        champions.append(participant['championId'])
-        runes.append(participant['perks']['perkIds'])
-
-    return list(zip(summoner_names, champions, runes))
+def get_info_from_request(api_info, api_key, info_to_request):
+    return requests.get(
+        url=f"{info_to_request}{api_info}",
+        params={
+            "api_key": api_key
+        })
 
 def check_for_errors(request):
     if request.ok:
@@ -99,27 +72,35 @@ def check_for_errors(request):
         print(f"Request Error: {request_error}")
         sys.exit(1)
 
-def replace_ids_into_names():
-    pass
+def game_summoners_info(current_game_info: dict) -> list[tuple[any, any, any]]:
+    summoner_names = (element['summonerName'] for element in current_game_info['participants'])
+    champions = (element['championId'] for element in current_game_info['participants'])
+    runes = (element['perks']['perkIds'] for element in current_game_info['participants'])
+
+    return list(zip(summoner_names, champions, runes))
 
 def check_player(summoner_name):
     API_KEY = get_api_key()
 
-    summoner = Summoner(
+    summoner_info = get_info_from_request(
         summoner_name,
-        API_ENDPOINTS["get_summoner_info"],
-        API_KEY
-    )
-
-    game = Game(
-        API_ENDPOINTS["get_current_game_info"],
         API_KEY,
-        summoner.get_summoner_info()
+        API_ENDPOINTS["get_summoner_info"]
     )
 
-    current_game_info = game.get_current_game_info()
-    print(current_game_summoners_info(current_game_info))
+    summoner = Summoner(summoner_info)
+
+    current_game_info = get_info_from_request(
+        summoner.summoner_info()['id'],
+        API_KEY,
+        API_ENDPOINTS["get_current_game_info"],
+    )
+
+    current_game = Game(current_game_info)
+
+    game_info = current_game.current_game_info()
+    print(game_summoners_info(game_info))
 
 
 if __name__ == "__main__":
-    check_player("")
+    check_player("Qwertyyy3")
