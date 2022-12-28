@@ -1,4 +1,6 @@
+from typing import Dict, List, Tuple
 from os import getenv
+import json
 from dotenv import load_dotenv
 import requests
 from references import API_ENDPOINTS, GAME_DATA
@@ -10,7 +12,7 @@ def get_checked_info(
         info_to_request: str,
         api_key: str,
         error_message: str
-) -> dict | None:
+) -> Dict | None:
     info_from_request = get_info_from_request(
         api_info, info_to_request, api_key
     )
@@ -52,10 +54,10 @@ def check_the_request_for_error(request: requests.Response, error_message: str) 
 
 
 def needed_current_game_summoners_info(
-    isolated_summoners_info: list[tuple[any, any, any]],
+    isolated_summoners_info: List[Tuple[str, int, List[int]]],
     url_to_champions_data: str,
     url_to_runes_data: str
-) -> dict[str, dict[str, tuple[str]]]:
+) -> str:
     summoners_info = {}
 
     for summoner in isolated_summoners_info:
@@ -72,14 +74,15 @@ def needed_current_game_summoners_info(
             )
         }
 
-    return summoners_info
+    return json.dumps(summoners_info, indent=4)
 
 
-def check_the_summoner_current_game(summoner_name: str) -> dict[str, dict[str, tuple[str]]] | None:
+def check_the_summoner_current_game(summoner_name: str, region: str) -> str | None:
     SUMMONER_ERROR_MESSAGE = "Summoner with this username does not exist"
+    summoner_api_info = API_ENDPOINTS["get_summoner_info"].replace(" ", region)
 
     summoner_info = get_checked_info(
-        api_info=API_ENDPOINTS["get_summoner_info"],
+        api_info=summoner_api_info,
         info_to_request=summoner_name,
         api_key=getenv("API_KEY"),
         error_message=SUMMONER_ERROR_MESSAGE
@@ -89,10 +92,11 @@ def check_the_summoner_current_game(summoner_name: str) -> dict[str, dict[str, t
         return None
 
     CURRENT_GAME_ERROR_MESSAGE = "The summoner is not currently in the game"
+    current_game_api_info = API_ENDPOINTS["get_current_game_info"].replace(" ", region)
     summoner_id = summoner_info["id"]
 
     current_game_info = get_checked_info(
-        api_info=API_ENDPOINTS["get_current_game_info"],
+        api_info=current_game_api_info,
         info_to_request=summoner_id,
         api_key=getenv("API_KEY"),
         error_message=CURRENT_GAME_ERROR_MESSAGE
@@ -111,5 +115,12 @@ def check_the_summoner_current_game(summoner_name: str) -> dict[str, dict[str, t
 
 if __name__ == "__main__":
     load_dotenv()
-    name_of_the_summoner = input("Enter the summoner's name -> ")
-    print(check_the_summoner_current_game(name_of_the_summoner))
+    REGIONS = ("BR1", "EUN1", "EUW1", "JP1", "KR", "LA1", "LA2", "NA1", "OC1", "RU", "TR1")
+    region_name = input(f"{', '.join(REGIONS)}\nEnter the region name -> ")
+
+    if region_name.upper() in REGIONS:
+        name_of_the_summoner = input("Enter the summoner's name -> ")
+        print(check_the_summoner_current_game(name_of_the_summoner, region_name.lower()))
+
+    else:
+        print("Unknown region")

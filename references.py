@@ -1,6 +1,8 @@
 API_ENDPOINTS = {
-    "get_summoner_info": "https://eun1.api.riotgames.com/lol/summoner/v4/summoners/by-name/",
-    "get_current_game_info": "https://eun1.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/",
+    "get_summoner_info":
+        "https:// .api.riotgames.com/lol/summoner/v4/summoners/by-name/",
+    "get_current_game_info":
+        "https:// .api.riotgames.com/lol/spectator/v4/active-games/by-summoner/",
 }
 
 GAME_DATA = {
