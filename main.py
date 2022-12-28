@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Any
 from os import getenv
 import json
 from dotenv import load_dotenv
@@ -12,7 +12,7 @@ def get_checked_info(
         info_to_request: str,
         api_key: str,
         error_message: str
-) -> Dict | None:
+) -> Dict[Any, Any] | None:
     info_from_request = get_info_from_request(
         api_info, info_to_request, api_key
     )
