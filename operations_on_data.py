@@ -10,8 +10,8 @@ def isolate_needed_summoners_info(current_game_info: dict) -> list[tuple[any, an
 
 
 def change_champion_id_to_champion_name(champion_id: str, url_to_data: str) -> str:
-    champions_data = f"{url_to_data}{champion_id}.json"
-    return requests.get(champions_data).json()["name"]
+    champion_data = f"{url_to_data}{champion_id}.json"
+    return requests.get(champion_data).json()["name"]
 
 
 def change_player_rune_ids_to_rune_names(rune_ids: list[int], url_to_data: str) -> tuple[str]:
