@@ -2,61 +2,56 @@ from typing import Dict, List, Tuple, Any
 from os import getenv
 import json
 from dotenv import load_dotenv
-import requests
-from references import API_ENDPOINTS, GAME_DATA
+
+import references
 import operations_on_data
+import request_functions
 
 
-def get_checked_info(
-        api_info: str,
-        info_to_request: str,
-        api_key: str,
-        error_message: str
-) -> Dict[Any, Any] | None:
-    info_from_request = get_info_from_request(
-        api_info, info_to_request, api_key
-    )
+class Summoner:
+    SUMMONER_ERROR_MESSAGE = "Summoner with this username does not exist"
 
-    if check_the_request_for_error(info_from_request, error_message):
-        return info_from_request.json()
+    def __init__(self, summoner_api_info: str) -> None:
+        self.summoner_api_info = summoner_api_info
 
-    return None
+    def get_info(self, summoner_name: str, api_key: str) -> Dict[Any, Any] | None:
+        summoner_info_from_request = request_functions.get_info_from_request(
+            api_info=self.summoner_api_info, info_to_request=summoner_name, api_key=api_key
+        )
 
+        if request_functions.check_the_request_for_error(
+                summoner_info_from_request,
+                self.SUMMONER_ERROR_MESSAGE
+        ):
+            return summoner_info_from_request.json()
 
-def get_info_from_request(
-    api_info: str,
-    info_to_request: str,
-    api_key: str
-) -> requests.Response:
-    return requests.get(url=f"{api_info}{info_to_request}", params={"api_key": api_key})
+        return None
 
 
-def check_the_request_for_error(request: requests.Response, error_message: str) -> bool:
-    try:
-        request.raise_for_status()
+class CurrentGame:
+    CURRENT_GAME_ERROR_MESSAGE = "The summoner is not currently in the game"
 
-        return True
+    def __init__(self, current_game_api_info: str) -> None:
+        self.current_game_api_info = current_game_api_info
 
-    except requests.exceptions.RequestException as request_error:
-        NO_ACCESS_CODE = 404
-        current_error_code = request_error.response.status_code
+    def get_info(self, summoner_id: str, api_key: str) -> Dict[Any, Any] | None:
+        current_game_info_from_request = request_functions.get_info_from_request(
+            api_info=self.current_game_api_info, info_to_request=summoner_id, api_key=api_key
+        )
 
-        if current_error_code == NO_ACCESS_CODE:
-            print(error_message)
+        if request_functions.check_the_request_for_error(
+                current_game_info_from_request,
+                self.CURRENT_GAME_ERROR_MESSAGE
+        ):
+            return current_game_info_from_request.json()
 
-        else:
-            print(
-                f"Error code: {current_error_code}\n"
-                f"Error message: {request_error.response.reason}"
-            )
-
-    return False
+        return None
 
 
 def needed_current_game_summoners_info(
-    isolated_summoners_info: List[Tuple[str, int, List[int]]],
-    url_to_champions_data: str,
-    url_to_runes_data: str
+        isolated_summoners_info: List[Tuple[str, int, List[int]]],
+        url_to_champions_data: str,
+        url_to_runes_data: str
 ) -> str:
     summoners_info = {}
 
@@ -78,28 +73,21 @@ def needed_current_game_summoners_info(
 
 
 def check_the_summoner_current_game(summoner_name: str, region: str) -> str | None:
-    SUMMONER_ERROR_MESSAGE = "Summoner with this username does not exist"
-    summoner_api_info = API_ENDPOINTS["get_summoner_info"].replace(" ", region)
+    summoner_api_info = references.API_ENDPOINTS["get_summoner_info"].replace(" ", region)
+    current_game_api_info = references.API_ENDPOINTS["get_current_game_info"].replace(" ", region)
 
-    summoner_info = get_checked_info(
-        api_info=summoner_api_info,
-        info_to_request=summoner_name,
-        api_key=getenv("API_KEY"),
-        error_message=SUMMONER_ERROR_MESSAGE
+    summoner = Summoner(summoner_api_info=summoner_api_info)
+    summoner_info = summoner.get_info(
+        summoner_name=summoner_name, api_key=getenv("API_KEY")
     )
 
     if summoner_info is None:
         return None
 
-    CURRENT_GAME_ERROR_MESSAGE = "The summoner is not currently in the game"
-    current_game_api_info = API_ENDPOINTS["get_current_game_info"].replace(" ", region)
     summoner_id = summoner_info["id"]
-
-    current_game_info = get_checked_info(
-        api_info=current_game_api_info,
-        info_to_request=summoner_id,
-        api_key=getenv("API_KEY"),
-        error_message=CURRENT_GAME_ERROR_MESSAGE
+    current_game = CurrentGame(current_game_api_info=current_game_api_info)
+    current_game_info = current_game.get_info(
+        summoner_id=summoner_id, api_key=getenv("API_KEY")
     )
 
     if current_game_info is None:
@@ -108,8 +96,8 @@ def check_the_summoner_current_game(summoner_name: str, region: str) -> str | No
     isolated_summoners_info = operations_on_data.isolate_needed_summoners_info(current_game_info)
     return needed_current_game_summoners_info(
         isolated_summoners_info=isolated_summoners_info,
-        url_to_champions_data=GAME_DATA["get_champions_data"],
-        url_to_runes_data=GAME_DATA["get_runes_data"]
+        url_to_champions_data=references.GAME_DATA["get_champions_data"],
+        url_to_runes_data=references.GAME_DATA["get_runes_data"]
     )
 
 

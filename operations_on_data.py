@@ -2,7 +2,9 @@ from typing import Dict, List, Tuple, Any
 import requests
 
 
-def isolate_needed_summoners_info(current_game_info: Dict[Any, Any]) -> List[Tuple[str, int, List[int]]]:
+def isolate_needed_summoners_info(
+        current_game_info: Dict[Any, Any]
+) -> List[Tuple[str, int, List[int]]]:
     summoner_names = (element["summonerName"] for element in current_game_info["participants"])
     champions = (element["championId"] for element in current_game_info["participants"])
     runes = (element["perks"]["perkIds"] for element in current_game_info["participants"])
