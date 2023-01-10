@@ -27,7 +27,7 @@ class Summoner:
 
         return False
 
-    def summoner_id(self) -> str | None:
+    def id(self) -> str | None:
         try:
             return self._summoner_info["id"]
 
@@ -87,20 +87,19 @@ def needed_current_game_summoners_info(
 
 
 def check_the_summoner_current_game(summoner_name: str, region: str) -> str | None:
-    summoner_api_info = references.API_ENDPOINTS["get_summoner_info"].replace(" ", region)
-    current_game_api_info = references.API_ENDPOINTS["get_current_game_info"].replace(" ", region)
+    summoner_api_url = references.API_ENDPOINTS["get_summoner_info"].replace(" ", region)
+    current_game_api_url = references.API_ENDPOINTS["get_current_game_info"].replace(" ", region)
 
     summoner_info_request = request_functions.get_info_from_request(
-        api_info=summoner_api_info, info_to_request=summoner_name, api_key=getenv("API_KEY")
+        api_info=summoner_api_url, info_to_request=summoner_name, api_key=getenv("API_KEY")
     )
 
     summoner = Summoner()
     if not summoner.assign_checked_summoner_info(summoner_info_request):
         return None
 
-    summoner_id = summoner.summoner_id()
     current_game_info_request = request_functions.get_info_from_request(
-        api_info=current_game_api_info, info_to_request=summoner_id, api_key=getenv("API_KEY")
+        api_info=current_game_api_url, info_to_request=summoner.id(), api_key=getenv("API_KEY")
     )
 
     current_game = CurrentGame()
@@ -128,3 +127,4 @@ if __name__ == "__main__":
 
     else:
         print("Unknown region")
+        
