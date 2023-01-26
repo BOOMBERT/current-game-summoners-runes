@@ -43,9 +43,9 @@ Start the program
 
 ```json
 {
-    "summoner_name0": {
-        "champion_name": "Irelia",
-        "rune_names": [
+    "summonerName0": {
+        "championName": "Irelia",
+        "runesNames": [
             "Conqueror",
             "Triumph",
             "Legend: Alacrity",
@@ -57,9 +57,9 @@ Start the program
             "Armor"
         ]
     },
-    "summoner_name1": {
-        "champion_name": "Wukong",
-        "rune_names": [
+    "summonerName1": {
+        "championName": "Wukong",
+        "runesNames": [
             "Conqueror",
             "Triumph",
             "Legend: Tenacity",
@@ -71,9 +71,9 @@ Start the program
             "Armor"
         ]
     },
-    "summoner_name2": {
-        "champion_name": "Katarina",
-        "rune_names": [
+    "summonerName2": {
+        "championName": "Katarina",
+        "runesNames": [
             "Conqueror",
             "Triumph",
             "Legend: Tenacity",
@@ -85,9 +85,9 @@ Start the program
             "Armor"
         ]
     },
-    "summoner_name3": {
-        "champion_name": "Draven",
-        "rune_names": [
+    "summonerName3": {
+        "championName": "Draven",
+        "runesNames": [
             "Lethal Tempo",
             "Triumph",
             "Legend: Alacrity",
@@ -99,9 +99,9 @@ Start the program
             "Armor"
         ]
     },
-    "summoner_name4": {
-        "champion_name": "Senna",
-        "rune_names": [
+    "summonerName4": {
+        "championName": "Senna",
+        "runesNames": [
             "Grasp of the Undying",
             "Demolish",
             "Conditioning",
@@ -113,9 +113,9 @@ Start the program
             "Health Scaling"
         ]
     },
-    "summoner_name5": {
-        "champion_name": "Talon",
-        "rune_names": [
+    "summonerName5": {
+        "championName": "Talon",
+        "runesNames": [
             "First Strike",
             "Magical Footwear",
             "Future's Market",
@@ -127,9 +127,9 @@ Start the program
             "Armor"
         ]
     },
-    "summoner_name6": {
-        "champion_name": "Zed",
-        "rune_names": [
+    "summonerName6": {
+        "championName": "Zed",
+        "runesNames": [
             "Electrocute",
             "Taste of Blood",
             "Eyeball Collection",
@@ -141,9 +141,9 @@ Start the program
             "Magic Resist"
         ]
     },
-    "summoner_name7": {
-        "champion_name": "Ezreal",
-        "rune_names": [
+    "summonerName7": {
+        "championName": "Ezreal",
+        "runesNames": [
             "First Strike",
             "Magical Footwear",
             "Biscuit Delivery",
@@ -155,9 +155,9 @@ Start the program
             "Armor"
         ]
     },
-    "summoner_name8": {
-        "champion_name": "Twitch",
-        "rune_names": [
+    "summonerName8": {
+        "championName": "Twitch",
+        "runesNames": [
             "Hail of Blades",
             "Taste of Blood",
             "Eyeball Collection",
@@ -169,9 +169,9 @@ Start the program
             "Armor"
         ]
     },
-    "summoner_name9": {
-        "champion_name": "Renekton",
-        "rune_names": [
+    "summonerName9": {
+        "championName": "Renekton",
+        "runesNames": [
             "Press the Attack",
             "Triumph",
             "Legend: Tenacity",
