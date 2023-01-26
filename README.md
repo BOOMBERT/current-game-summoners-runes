@@ -28,8 +28,7 @@ Go to the project directory
 Install the necessary libraries
 
 ```bash
-  pip install python-dotenv
-  pip install requests
+  pip install -r requirements.txt
 ```
 
 Start the program
