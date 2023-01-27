@@ -1,4 +1,4 @@
-from typing import List, Any, Generator
+from typing import List, Dict, Any, Generator
 from os import getenv
 import json
 from dotenv import load_dotenv
@@ -24,23 +24,22 @@ class InitialSummoner:
 
 
 class Summoner:
-    def __init__(self, name: str, champion_name: str, runes_names: List[str]) -> None:
+    def __init__(self, name: str, champion_id: int, runes_ids: List[int]) -> None:
         self.name = name
-        self.champion_name = champion_name
-        self.runes_names = runes_names
+        self.champion_name = operations_on_data.change_champion_id_to_champion_name(champion_id)
+        self.runes_names = operations_on_data.change_player_runes_ids_to_runes_names(runes_ids)
 
-    @classmethod
-    def info_with_changed_ids_to_names(
-            cls, name: str, champion_id: int, runes_ids: List[int]
-    ) -> "Summoner":
-        champion_name = operations_on_data.change_champion_id_to_champion_name(champion_id)
-        runes_names = operations_on_data.change_player_runes_ids_to_runes_names(runes_ids)
-
-        return cls(name, champion_name, runes_names)
+    def result_dict_with_summoner_info(self) -> Dict:
+        return {
+            self.name: {
+                "championName": self.champion_name,
+                "runesNames": self.runes_names
+            }
+        }
 
 
 class CurrentGameInfo:
-    _summoners_in_game = []
+    _summoners_in_current_game = []
     _summoners_info = {}
 
     def __init__(self, data_with_info) -> None:
@@ -68,14 +67,13 @@ class CurrentGameInfo:
         )
 
     def add_summoner(self, summoner: Summoner) -> None:
-        self._summoners_in_game.append(summoner)
+        self._summoners_in_current_game.append(summoner)
 
     def add_summoner_needed_info_to_result_data(self) -> None:
-        for summoner in self._summoners_in_game:
-            self._summoners_info[summoner.name] = {
-                "championName": summoner.champion_name,
-                "runesNames": summoner.runes_names
-            }
+        for summoner in self._summoners_in_current_game:
+            self._summoners_info.update(
+                summoner.result_dict_with_summoner_info()
+            )
 
     def get_result_with_summoners_info(self) -> str | None:
         if not self._summoners_info:
@@ -118,7 +116,7 @@ def add_needed_changed_summoner_info_to_current_game_info(
                 )
         ):
             current_game.add_summoner(
-                Summoner.info_with_changed_ids_to_names(name, champion_id, runes_ids)
+                Summoner(name, champion_id, runes_ids)
             )
 
     except KeyError as key_error:
