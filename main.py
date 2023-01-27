@@ -40,6 +40,7 @@ class Summoner:
 
 
 class CurrentGameInfo:
+    _summoners_in_game = []
     _summoners_info = {}
 
     def __init__(self, data_with_info) -> None:
@@ -48,7 +49,12 @@ class CurrentGameInfo:
     def get_specific_info(
             self, first_key_name: str, second_key_name: str = ""
     ) -> Generator[Any, Any, None]:
-        elements_with_info = self._data_with_info["participants"]
+        try:
+            elements_with_info = self._data_with_info["participants"]
+
+        except KeyError as key_error:
+            raise SystemExit("Data problem") from key_error
+
         return (
             (
                 element[first_key_name][second_key_name]
@@ -61,13 +67,17 @@ class CurrentGameInfo:
             )
         )
 
-    def add_summoner_needed_info(self, summoner: Summoner) -> None:
-        self._summoners_info[summoner.name] = {
-            "championName": summoner.champion_name,
-            "runesNames": summoner.runes_names
-        }
+    def add_summoner(self, summoner: Summoner) -> None:
+        self._summoners_in_game.append(summoner)
 
-    def result_with_summoners_info(self) -> str | None:
+    def add_summoner_needed_info_to_result_data(self) -> None:
+        for summoner in self._summoners_in_game:
+            self._summoners_info[summoner.name] = {
+                "championName": summoner.champion_name,
+                "runesNames": summoner.runes_names
+            }
+
+    def get_result_with_summoners_info(self) -> str | None:
         if not self._summoners_info:
             print("The summoners info is empty")
             return None
@@ -107,7 +117,7 @@ def add_needed_changed_summoner_info_to_current_game_info(
                     second_key_name=RUNES_NAMES_KEY[1]
                 )
         ):
-            current_game.add_summoner_needed_info(
+            current_game.add_summoner(
                 Summoner.info_with_changed_ids_to_names(name, champion_id, runes_ids)
             )
 
@@ -152,7 +162,9 @@ class Application:
         self.get_current_game_info()
 
         add_needed_changed_summoner_info_to_current_game_info(self._current_game_info)
-        print(self._current_game_info.result_with_summoners_info())
+        self._current_game_info.add_summoner_needed_info_to_result_data()
+
+        print(self._current_game_info.get_result_with_summoners_info())
 
 
 def main() -> None:

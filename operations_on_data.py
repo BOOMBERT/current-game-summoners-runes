@@ -26,9 +26,6 @@ def change_player_runes_ids_to_runes_names(runes_ids: List[int]) -> List[str] | 
         counter = 0
 
         for rune in runes_data:
-            if counter == 9:
-                break
-
             if runes_ids.count(rune["id"]) == 2:
                 runes_names[runes_ids.index(
                     rune["id"], runes_ids.index(rune["id"]) + 1, len(runes_data)
@@ -38,6 +35,9 @@ def change_player_runes_ids_to_runes_names(runes_ids: List[int]) -> List[str] | 
             if rune["id"] in runes_ids:
                 runes_names[runes_ids.index(rune["id"])] = rune["name"]
                 counter += 1
+
+            if counter == len(runes_ids):
+                break
 
         return runes_names
 
